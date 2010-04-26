@@ -1,0 +1,7 @@
+VTK LEARNING TODO LIST :
+[IN PROGRESS (or not....)]Compiling VTK with shared libraries Debug under mac osx 10.6.3 with QT support
+building a simple pipeline (read and display)
+simple pipeline with a filter
+connection with QT
+connection with ITK
+connection with QT and ITK

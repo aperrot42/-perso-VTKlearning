@@ -1,5 +1,5 @@
 #include <vtkMath.h>
-
+#include <vtk
 int main(int arc, char argv[])
 {
   // Create 2 pts
@@ -16,6 +16,6 @@ int main(int arc, char argv[])
   << " is " << dist << std::endl;
 
 
-
+  return EXIT_SUCCESS;
 }
 

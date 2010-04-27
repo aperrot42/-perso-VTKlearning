@@ -30,6 +30,7 @@ points->InsertNextPoint(p4);
 
 vtkSmartPointer<vtkPyramid> Pyramid = vtkSmartPointer<vtkPyramid>::New();
 
-Pyramid->Contour();
-}
-
+Pyramid->GetPointIds()->SetId(0, 0);
+Pyramid->GetPointIds()->SetId(1, 1);
+Pyramid->GetPointIds()->SetId(2, 2);
+Pyramid->GetPointIds()->SetId(3, 3);

@@ -84,6 +84,26 @@
   <variable>buildconfiguration-all-cleanstep0</variable>
   <valuemap type="QVariantMap">
    <value key="ProjectExplorer.BuildConfiguration.DisplayName" type="QString">all</value>
+   <valuelist key="abstractProcess.Environment" type="QVariantList">
+    <value type="QString">Apple_PubSub_Socket_Render=/tmp/launch-yrzVRQ/Render</value>
+    <value type="QString">COMMAND_MODE=unix2003</value>
+    <value type="QString">DISPLAY=/tmp/launch-7ca7y2/org.x:0</value>
+    <value type="QString">HOME=/Users/antonin</value>
+    <value type="QString">LOGNAME=antonin</value>
+    <value type="QString">PATH=/usr/bin:/bin:/usr/sbin:/sbin</value>
+    <value type="QString">SHELL=/bin/bash</value>
+    <value type="QString">SSH_AUTH_SOCK=/tmp/launch-fSy25O/Listeners</value>
+    <value type="QString">TMPDIR=/var/folders/Ei/EiMDxo1WExuUZI4GKwyVxk+++TI/-Tmp-/</value>
+    <value type="QString">USER=antonin</value>
+    <value type="QString">__CF_USER_TEXT_ENCODING=0x1F5:0:0</value>
+   </valuelist>
+   <value key="abstractProcess.IgnoreReturnValue" type="bool">true</value>
+   <valuelist key="abstractProcess.arguments" type="QVariantList">
+    <value type="QString">clean</value>
+   </valuelist>
+   <value key="abstractProcess.command" type="QString">make</value>
+   <value key="abstractProcess.enabled" type="bool">true</value>
+   <value key="abstractProcess.workingDirectory" type="QString">/Users/antonin/CVSROOT/VTKlearning/ViewCone/qtcreator-build</value>
    <valuelist key="additionalArguments" type="QVariantList">
     <value type="QString">clean</value>
    </valuelist>

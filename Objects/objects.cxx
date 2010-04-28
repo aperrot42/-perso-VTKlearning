@@ -14,8 +14,6 @@ typedef float point3D[3]; // is it float or doule format for visu ?
 // create a line and store it in a polydata
 vtkSmartPointer<vtkPolyData> CreateLine(point3D p0,point3D p1);
 
-// create a circle and store it into a polydata
-vtkSmartPointer<vtkPolyData> CreateLine(point3D p0,point3D p1);
 
 
 

@@ -212,7 +212,7 @@ int main(int argc, char* argv[])
   zoomCallback->SetClientData(vtkImgViewer1);
   // add observer
   vtkImgViewer2->GetRenderWindow()->AddObserver
-                            ( vtkCommand::ModifiedEvent, zoomCallback );
+                            ( vtkCommand::AnyEvent, zoomCallback );
 
   vtkImgViewer2->GetRenderer()->SetActiveCamera(cam);
   std::cout << "gf" ;

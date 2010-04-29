@@ -31,25 +31,61 @@
 
 
 
+
+class filteringItk
+{
+
+
+
+
+};
+
+class displayingVtk
+{
+
+
+
+
+
+};
+
+
+int parseInput (int argc, char* argv[], std::string fileName, char thresholdValue)
+{
+
+  //Verify input arguments
+  if ( argc != 3 )
+    {
+    std::cerr << "Usage: " << std::endl;
+    std::cerr << argv[0] << "(.exe) takes 1 argument" <<std::endl;
+    std::cerr <<"1- input image file" <<std::endl;
+    std::cerr <<"2- threshold value" <<std::endl;
+    return 1;
+    }
+
+  //Parse input argument
+  fileName = static_cast<std::string> (argv[1]);
+  thresholdValue = static_cast<char> (atoi(argv[2]));
+  return 0;
+}
+
+
+
+
+
+
 void ZoomFunction ( vtkObject* caller, long unsigned int eventId, void* clientData, void* callData );
 
 
 int main(int argc, char* argv[])
 {
 
-  //Verify input arguments
-  if ( argc != 3 )
-    {
-    vtkstd::cerr << "Usage: " << std::endl;
-    vtkstd::cerr << argv[0] << "(.exe) takes 1 argument" <<std::endl;
-    vtkstd::cerr <<"1- input image file" <<std::endl;
-    vtkstd::cerr <<"2- threshold value" <<std::endl;
-    return EXIT_FAILURE;
-    }
 
-  //Parse input argument
-  vtkstd::string argInputFilename = static_cast<vtkstd::string> (argv[1]);
+  //Parse input
+  std::string argInputFilename = static_cast<std::string> (argv[1]);
   char argThresholdLevel = static_cast<char> (atoi(argv[2]));
+  if (parseInput ( argc, argv, argInputFilename, argThresholdLevel))
+    return EXIT_FAILURE;
 
   //image itk type :
   // Dimension of the image
@@ -69,7 +105,7 @@ int main(int argc, char* argv[])
   //Read the image : with a vtk jpg reader :
   vtkSmartPointer<vtkJPEGReader> jPEGReader = vtkSmartPointer<vtkJPEGReader>::New();
   jPEGReader->SetFileName ( inputFilename1.c_str() );
-  vtkstd::cout << "Reading " << inputFilename1.c_str() << vtkstd::endl;
+  std::cout << "Reading " << inputFilename1.c_str() << std::endl;
   */
 
   try // try to read the input file
@@ -108,6 +144,7 @@ int main(int argc, char* argv[])
 
   vtkImgViewer1->Render();
 
+  vtkCamera* cam = vtkImgViewer1->GetRenderer()->GetActiveCamera();
 
 
   //Threshold filtering :
@@ -144,7 +181,6 @@ int main(int argc, char* argv[])
 
 
   vtkSmartPointer<vtkImageViewer2> vtkImgViewer2 = vtkSmartPointer<vtkImageViewer2>::New();
-
   vtkImgViewer2->SetInput(itkToVtkImageFilter2->GetOutput());
 
   // Set up the visualization 2
@@ -155,25 +191,31 @@ int main(int argc, char* argv[])
    vtkSmartPointer<vtkRenderWindowInteractor>::New();
   vtkInteractor2->SetInteractorStyle(vtkInteractorStyle2);
 
-  vtkImgViewer2->SetupInteractor(vtkInteractor2);
+  vtkImgViewer2->SetupInteractor(vtkInteractor);
 
   vtkImgViewer2->Render();
 
 
   // visualize
 
-  vtkImgViewer2->GetRenderWindow()->GetInteractor()->Initialize();
-  vtkImgViewer1->GetRenderWindow()->GetInteractor()->Initialize();
+ // vtkImgViewer2->GetRenderWindow()->GetInteractor()->Initialize();
+ // vtkImgViewer1->GetRenderWindow()->GetInteractor()->Initialize();
 
 
   // add observer to process events :
+  // declare a callback
   vtkSmartPointer<vtkCallbackCommand> zoomCallback =
                                     vtkSmartPointer<vtkCallbackCommand>::New();
+  //declare the function associated to callback
   zoomCallback->SetCallback ( ZoomFunction );
-  vtkImgViewer2->GetRenderWindow()->GetInteractor()->AddObserver
-                            ( vtkCommand::RightButtonPressEvent, zoomCallback );
-  zoomCallback->SetClientData(itkThresholdFilter);
+  // set client data of the callback
+  zoomCallback->SetClientData(vtkImgViewer1);
+  // add observer
+  vtkImgViewer2->GetRenderWindow()->AddObserver
+                            ( vtkCommand::ModifiedEvent, zoomCallback );
 
+  vtkImgViewer2->GetRenderer()->SetActiveCamera(cam);
+  std::cout << "gf" ;
   // display loop
   vtkImgViewer2->GetRenderWindow()->GetInteractor()->Start();
 
@@ -184,5 +226,8 @@ int main(int argc, char* argv[])
 
 void ZoomFunction ( vtkObject* caller, long unsigned int eventId, void* clientData, void* callData )
 {
-  vtkstd::cout << "interaction by callback" << vtkstd::endl;
+  vtkSmartPointer<vtkImageViewer2> clientViewer =
+                                    static_cast<vtkImageViewer2*>(clientData);
+  clientViewer->Render();
+  std::cout << "evt" <<std::endl ;
 }

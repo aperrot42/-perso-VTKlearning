@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
 
 PROJECT(ITKVTKQT)
-  
+
   # we want a debug version
   SET (CMAKE_BUILD_TYPE Debug)
 
@@ -35,6 +35,7 @@ vtkImaging vtkIO vtkFiltering vtkCommon )
   # sources of the project
   SET( ITKVTKQT_SRCS
        ItkVtkQt.cxx
+       form.cxx
   )
 
 
@@ -51,18 +52,17 @@ vtkImaging vtkIO vtkFiltering vtkCommon )
 
 
 
-  # **********************QT SPECIFICS***************  
+  # **********************QT SPECIFICS***************
   # Qt processed headers
-  #SET( ITKVTKQT_MOC_HDRS
-  #    ItkVtkQt.h
-  #)
+  SET( ITKVTKQT_MOC_HDRS
+      form.h
+  )
 
-  
+
   # Qt .ui files
-  #SET( ITKVTKQT_UIS
-  #     ITKVTKQTBook.ui
-  #       src/ui/Dialog2.ui
-  #)
+  SET( ITKVTKQT_UIS
+       form.ui
+  )
 
   # Qt resource file
   #  SET( ITKVTKQT_RCS
@@ -119,7 +119,7 @@ vtkImaging vtkIO vtkFiltering vtkCommon )
 
 
 
-  
+
 
 
 

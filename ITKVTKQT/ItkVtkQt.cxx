@@ -1,73 +1,219 @@
-#include <vtkSmartPointer.h>
 
-#include <vtkJPEGReader.h>
-//#include “itkCommand.h” // for later use se itk vtk connection
+
+//VTK includes
+#include <vtkSmartPointer.h>
 #include <itkImage.h>
 #include <vtkImageData.h>
-//#include “vtkKWImageIO.h”
-//#include “vtkKWImage.h”
-#include <vtkImageActor.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
-
+#include <vtkImageViewer2.h>
+#include <vtkCamera.h>
 #include <vtkInteractorStyleImage.h>
+#include <vtkCallbackCommand.h>
+#include <vtkCommand.h>
+
+// ITK includes
+#include <itkImage.h>
+#include <itkImageFileReader.h>
+#include <itkImageToVTKImageFilter.h>
+#include <itkNumericTraits.h>
+#include <itkThresholdImageFilter.h>
+
+
+// QT includes
+#include <QtGui>
+#include "form.h"
+
+
+int parseInput (int argc, char* argv[], std::string fileName, char thresholdValue)
+{
+
+  //Verify input arguments
+  if ( argc != 3 )
+    {
+    std::cerr << "Usage: " << std::endl;
+    std::cerr << argv[0] << "(.exe) takes 1 argument" <<std::endl;
+    std::cerr <<"1- input image file" <<std::endl;
+    std::cerr <<"2- threshold value" <<std::endl;
+    return 1;
+    }
+
+  //Parse input argument
+  fileName = static_cast<std::string> (argv[1]);
+  thresholdValue = static_cast<char> (atoi(argv[2]));
+  return 0;
+}
+
+
+
+
+void ZoomFunction ( vtkObject* caller, long unsigned int eventId, void* clientData, void* callData )
+{
+  vtkSmartPointer<vtkImageViewer2> clientViewer =
+                                    static_cast<vtkImageViewer2*>(clientData);
+  clientViewer->Render();
+}
+
+
+
+
 
 int main(int argc, char* argv[])
 {
 
-  //Verify input arguments
-  if ( argc != 2 )
-    {
-    vtkstd::cerr << "Usage: " << std::endl;
-    vtkstd::cerr << argv[0] << "(.exe) takes 1 argument" <<std::endl;
-    vtkstd::cerr <<"1- inputImageFile" <<std::endl;
+  //Parse input
+  std::string argInputFilename = static_cast<std::string> (argv[1]);
+  char argThresholdLevel = static_cast<char> (atoi(argv[2]));
+  if (parseInput ( argc, argv, argInputFilename, argThresholdLevel))
     return EXIT_FAILURE;
-    }
 
-  //Parse input argument
-  vtkstd::string inputFilename1 = static_cast<vtkstd::string> (argv[1]);
+  QApplication app(argc, argv);
 
+
+  Form displayQT1;
+  displayQT1.show();
+
+ app.exec();
+
+
+  //image itk type :
+  // Dimension of the image
+  const unsigned Dimension = 2;
+  // The type of manipulated pixels :
+  typedef unsigned char itkPixelType;
+  // The type of manipulated images :
+  typedef itk::Image< itkPixelType, Dimension > itkImageType;
+
+  //Read the image with an itk reader:
+  typedef itk::ImageFileReader<itkImageType> itkReaderType;
+  itkReaderType::Pointer itkReader = itkReaderType::New();
+  itkReader->SetFileName(argInputFilename);
+  itkReader->Update();
+
+  /*
   //Read the image : with a vtk jpg reader :
   vtkSmartPointer<vtkJPEGReader> jPEGReader = vtkSmartPointer<vtkJPEGReader>::New();
   jPEGReader->SetFileName ( inputFilename1.c_str() );
-  vtkstd::cout << "Reading " << inputFilename1.c_str() << vtkstd::endl;
+  std::cout << "Reading " << inputFilename1.c_str() << std::endl;
+  */
 
-  // Storing image in a vtkimagedata object :
-  // Good count referencing pointer declaration & allocation
-  // Smart pointer musn't be reallocated (<=>references)
-  vtkSmartPointer<vtkImageData> vtkImage = jPEGReader->GetOutput();
+  try // try to read the input file
+    {
+    itkReader->Update();
+    }
+  catch( itk::ExceptionObject & excp )  // If something goes wrong
+    {
+    std::cerr << "Problem reading the input file" << std::endl;
+    std::cerr << excp << std::endl;
+    return EXIT_FAILURE;
+    }
 
-  // Define the actor(s) of the screen : only one image
-  vtkSmartPointer<vtkImageActor> actor = vtkSmartPointer<vtkImageActor>::New();
-  actor->SetInput( vtkImage );
+  //Connecting itk pipeline to vtk pipeline :
+  //declaration of the adapter
+  typedef itk::ImageToVTKImageFilter<itkImageType> itkToVtkImageFilterType;
+  itkToVtkImageFilterType::Pointer itkToVtkImageFilter =
+                            itkToVtkImageFilterType::New();
+  //connections itk to vtk
+  itkToVtkImageFilter->SetInput(itkReader->GetOutput());
 
-  // Define the renderer with its actor (our camera)
-  vtkSmartPointer<vtkRenderer> renderer =
-    vtkSmartPointer<vtkRenderer>::New();
-  renderer->AddActor(actor);
 
-  vtkSmartPointer<vtkRenderWindow> window =
-    vtkSmartPointer<vtkRenderWindow>::New();
-  window->AddRenderer(renderer);
+  vtkSmartPointer<vtkImageViewer2> vtkImgViewer1 = vtkSmartPointer<vtkImageViewer2>::New();
 
-  // Set up the interaction
-  vtkSmartPointer<vtkInteractorStyleImage> imageStyle =
+  vtkImgViewer1->SetInput(itkToVtkImageFilter->GetOutput());
+
+  // Set up the visualization 1
+  vtkSmartPointer<vtkInteractorStyleImage> vtkInteractorStyle =
     vtkSmartPointer<vtkInteractorStyleImage>::New();
-  vtkSmartPointer<vtkRenderWindowInteractor> interactor =
+
+  vtkSmartPointer<vtkRenderWindowInteractor> vtkInteractor =
     vtkSmartPointer<vtkRenderWindowInteractor>::New();
-  interactor->SetInteractorStyle(imageStyle);
-  window->SetInteractor(interactor);
-  window->Render();
+  vtkInteractor->SetInteractorStyle(vtkInteractorStyle);
+
+  vtkImgViewer1->SetupInteractor(vtkInteractor);
+
+  vtkImgViewer1->Render();
+
+  vtkCamera* cam = vtkImgViewer1->GetRenderer()->GetActiveCamera();
 
 
-  // Start interaction
-  // The Start() method doesn't return until the window is closed by the user
-  interactor->Start();
+  //Threshold filtering :
+  // Threshold filter creation :
+  typedef itk::ThresholdImageFilter< itkImageType > itkThresholdFilterType;
+  itkThresholdFilterType::Pointer itkThresholdFilter = itkThresholdFilterType::New();
+
+  //Threshold filter initialization
+  itkThresholdFilter->SetInput(itkReader->GetOutput());
+  itkThresholdFilter->SetOutsideValue( itk::NumericTraits< itkPixelType >::Zero );
+
+  // Threshold level setting
+  itkThresholdFilter->ThresholdBelow(argThresholdLevel);
+
+  try
+    {
+    itkThresholdFilter->Update();
+    }
+  catch( itk::ExceptionObject & excp )  // If something goes wrong
+    {
+    std::cerr << "Problem while filtering" << std::endl;
+    std::cerr << excp << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  //Connecting itk pipeline to vtk pipeline :
+  //declaration of the adapter
+  typedef itk::ImageToVTKImageFilter<itkImageType> itkToVtkImageFilterType;
+  itkToVtkImageFilterType::Pointer itkToVtkImageFilter2 =
+                            itkToVtkImageFilterType::New();
+
+  //connections itk to vtk
+  itkToVtkImageFilter2->SetInput(itkThresholdFilter->GetOutput());
 
 
+  vtkSmartPointer<vtkImageViewer2> vtkImgViewer2 = vtkSmartPointer<vtkImageViewer2>::New();
+  vtkImgViewer2->SetInput(itkToVtkImageFilter2->GetOutput());
 
+  // Set up the visualization 2
+  // we only need one interactor here for both images :
+  /*
+  vtkSmartPointer<vtkInteractorStyleImage> vtkInteractorStyle2 =
+    vtkSmartPointer<vtkInteractorStyleImage>::New();
+
+  vtkSmartPointer<vtkRenderWindowInteractor> vtkInteractor2 =
+   vtkSmartPointer<vtkRenderWindowInteractor>::New();
+  vtkInteractor2->SetInteractorStyle(vtkInteractorStyle2);
+  */
+  vtkImgViewer2->SetupInteractor(vtkInteractor);
+
+  vtkImgViewer2->Render();
+
+
+  // visualize
+
+ // vtkImgViewer2->GetRenderWindow()->GetInteractor()->Initialize();
+ // vtkImgViewer1->GetRenderWindow()->GetInteractor()->Initialize();
+
+
+  // add observer to process events :
+  // declare a callback
+  vtkSmartPointer<vtkCallbackCommand> zoomCallback =
+                                    vtkSmartPointer<vtkCallbackCommand>::New();
+  //declare the function associated to callback
+  zoomCallback->SetCallback ( ZoomFunction );
+  // set client data of the callback
+  zoomCallback->SetClientData(vtkImgViewer1);
+  // add observer
+  vtkImgViewer2->GetRenderWindow()->AddObserver
+                            ( vtkCommand::AnyEvent, zoomCallback );
+
+  vtkImgViewer2->GetRenderer()->SetActiveCamera(cam);
+  std::cout << "gf" ;
+  // display loop
+  vtkImgViewer2->GetRenderWindow()->GetInteractor()->Start();
 
 
   return EXIT_SUCCESS;
 }
+
+
+

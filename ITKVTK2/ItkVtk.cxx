@@ -29,7 +29,8 @@
 #include <itkNumericTraits.h>
 #include <itkThresholdImageFilter.h>
 
-
+// I only use 1 interactor and 1 camera in this example.
+// I link the interaction event between the two windows.
 
 
 class filteringItk
@@ -184,13 +185,15 @@ int main(int argc, char* argv[])
   vtkImgViewer2->SetInput(itkToVtkImageFilter2->GetOutput());
 
   // Set up the visualization 2
+  // we only need one interactor here for both images :
+  /*
   vtkSmartPointer<vtkInteractorStyleImage> vtkInteractorStyle2 =
     vtkSmartPointer<vtkInteractorStyleImage>::New();
 
   vtkSmartPointer<vtkRenderWindowInteractor> vtkInteractor2 =
    vtkSmartPointer<vtkRenderWindowInteractor>::New();
   vtkInteractor2->SetInteractorStyle(vtkInteractorStyle2);
-
+  */
   vtkImgViewer2->SetupInteractor(vtkInteractor);
 
   vtkImgViewer2->Render();
@@ -229,5 +232,4 @@ void ZoomFunction ( vtkObject* caller, long unsigned int eventId, void* clientDa
   vtkSmartPointer<vtkImageViewer2> clientViewer =
                                     static_cast<vtkImageViewer2*>(clientData);
   clientViewer->Render();
-  std::cout << "evt" <<std::endl ;
 }

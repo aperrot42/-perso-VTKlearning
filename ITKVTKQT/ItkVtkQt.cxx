@@ -2,6 +2,8 @@
 #include <itkImageToVTKImageFilter.h>
 #include <itkImage.h>
 #include <itkImageFileReader.h>
+#include <itkThresholdImageFilter.h>
+
 
 //VTK includes
 // The QVTK widget ...
@@ -82,11 +84,64 @@ int main(int argc, char* argv[])
   itkToVtkImageFilter->SetInput(itkReader->GetOutput());
 
 
+
+
+
+
+
+
+
+
+
+  //Threshold filtering :
+  // Threshold filter creation :
+  typedef itk::ThresholdImageFilter< itkImageType > itkThresholdFilterType;
+  itkThresholdFilterType::Pointer itkThresholdFilter = itkThresholdFilterType::New();
+
+  //Threshold filter initialization
+  itkThresholdFilter->SetInput(itkReader->GetOutput());
+  itkThresholdFilter->SetOutsideValue( itk::NumericTraits< itkPixelType >::Zero );
+
+  // Threshold level setting
+  itkThresholdFilter->ThresholdBelow(argThresholdLevel);
+
+  try
+    {
+    itkThresholdFilter->Update();
+    }
+  catch( itk::ExceptionObject & excp )  // If something goes wrong
+    {
+    std::cerr << "Problem while filtering" << std::endl;
+    std::cerr << excp << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  //Connecting itk pipeline to vtk pipeline :
+  //declaration of the adapter
+  typedef itk::ImageToVTKImageFilter<itkImageType> itkToVtkImageFilterType;
+  itkToVtkImageFilterType::Pointer itkToVtkImageFilter2 =
+                            itkToVtkImageFilterType::New();
+
+  //connections itk to vtk
+  itkToVtkImageFilter2->SetInput(itkThresholdFilter->GetOutput());
+
+
+
+
+
+
+
+/*
+Good : we have a pipeline in memory and we are ready to display on a windows
+
+*/
+
+
   QApplication app(argc, argv);
 
 
   // declaration of the QT form we give the image data pointer as input
-  Form formQT1(0,itkToVtkImageFilter->GetOutput());
+  Form formQT1(0,itkToVtkImageFilter->GetOutput(), itkToVtkImageFilter2->GetOutput());
 
   formQT1.show();
 

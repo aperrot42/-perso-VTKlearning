@@ -6,8 +6,10 @@
 #include <vtkImageActor.h>
 
 
-
+// forward declaration (just used as pointers in the header, this is okay)
 class vtkImageData;
+class vtkCamera;
+
 
 namespace Ui {
     class Form;
@@ -16,11 +18,13 @@ namespace Ui {
 class Form : public QWidget, private Ui::Form {
     Q_OBJECT
 public:
-    Form(QWidget *parent = 0, vtkImageData *vtkImage = 0);
+    Form(QWidget *parent = 0, vtkImageData *vtkImage = 0,vtkImageData *vtkImage2 = 0);
     ~Form();
 
 protected:
     void changeEvent(QEvent *e);
+
+ private:
 
 
 };

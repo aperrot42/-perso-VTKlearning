@@ -17,13 +17,13 @@
 #include <vtkImageData.h>
 #include <vtkCamera.h>
 // Form constructor
-Form::Form(QWidget *parent, vtkImageData *vtkImage) : QWidget(parent)
+Form::Form(QWidget *parent, vtkImageData *vtkImage, vtkImageData *vtkImage2) : QWidget(parent)
 
 {
     setupUi(this);
 
 
-/*
+
   vtkSmartPointer<vtkSphereSource> sphereSource =
       vtkSmartPointer<vtkSphereSource>::New();
   sphereSource->Update();
@@ -43,7 +43,6 @@ Form::Form(QWidget *parent, vtkImageData *vtkImage) : QWidget(parent)
   // VTK/Qt wedded
   this->widget->GetRenderWindow()->AddRenderer(renderer);
 
-*/
 
 
 
@@ -58,13 +57,14 @@ Form::Form(QWidget *parent, vtkImageData *vtkImage) : QWidget(parent)
 
 
 
+  // Set up the visualization 1
 
 
   vtkSmartPointer<vtkImageViewer2> vtkImgViewer1 = vtkSmartPointer<vtkImageViewer2>::New();
 
   vtkImgViewer1->SetInput(vtkImage);
 
-  // Set up the visualization 1
+
   vtkSmartPointer<vtkInteractorStyleImage> vtkInteractorStyle =
     vtkSmartPointer<vtkInteractorStyleImage>::New();
 
@@ -76,7 +76,8 @@ Form::Form(QWidget *parent, vtkImageData *vtkImage) : QWidget(parent)
 
   vtkImgViewer1->Render();
 
- // vtkCamera* cam = vtkImgViewer1->GetRenderer()->GetActiveCamera();
+  // set the camera
+  vtkCamera *cam = vtkImgViewer1->GetRenderer()->GetActiveCamera();
 
 
 // makes the program crash :
@@ -86,6 +87,26 @@ Form::Form(QWidget *parent, vtkImageData *vtkImage) : QWidget(parent)
 
 
 this->qvtkWidget_a->GetRenderWindow()->AddRenderer(vtkImgViewer1->GetRenderer());
+
+
+
+
+  // Set up the visualization 2
+  vtkSmartPointer<vtkImageViewer2> vtkImgViewer2 = vtkSmartPointer<vtkImageViewer2>::New();
+
+  vtkImgViewer2->SetInput(vtkImage2);
+
+  vtkImgViewer2->GetRenderer()->SetActiveCamera(cam);
+
+
+
+// No effect ????
+  vtkImgViewer2->SetupInteractor(vtkInteractor);
+
+
+  vtkImgViewer2->Render();
+
+this->qvtkWidget_b->GetRenderWindow()->AddRenderer(vtkImgViewer2->GetRenderer());
 
 }
 

@@ -18,7 +18,7 @@ PROJECT(ITKVTKQT)
   # we use vtk
   FIND_PACKAGE(VTK REQUIRED)
   INCLUDE(${VTK_USE_FILE})
-  SET(VTK_LIBRARIES vtkRendering vtkGraphics vtkHybrid
+  SET(VTK_LIBRARIES QVTK vtkRendering vtkGraphics vtkHybrid
 vtkImaging vtkIO vtkFiltering vtkCommon )
 
   #we use itk
@@ -36,17 +36,18 @@ vtkImaging vtkIO vtkFiltering vtkCommon )
   SET( ITKVTKQT_SRCS
        ItkVtkQt.cxx
        form.cxx
+       classes/pipeItkVtk.cxx
   )
 
 
-  #We have several additional sources : the ItktoVtk wrappers
+  #We have several additional classes : the ItktoVtk wrappers and some personal classes
   # and some personal classes
-
   SET( SUBFOLDERS_LIST
     wrap
+    classes
   )
   FOREACH( dir ${SUBFOLDERS_LIST} )
-    ADD_SUBDIRECTORY( ${dir} )
+  #  ADD_SUBDIRECTORY( ${dir} )
     INCLUDE_DIRECTORIES( ${dir})
   ENDFOREACH( dir ${SUBFOLDERS_LIST} )
 
@@ -83,7 +84,7 @@ vtkImaging vtkIO vtkFiltering vtkCommon )
 
   # this command will generate rules that will run rcc on all files from SAMPLE_RCS
   # in result SAMPLE_RC_SRCS variable will contain paths to files produced by rcc
-  QT4_ADD_RESOURCES( ITKVTKQT_RC_SRCS ${ITKVTKQT_RCS} )
+  # QT4_ADD_RESOURCES( ITKVTKQT_RC_SRCS ${ITKVTKQT_RCS} )
 
   # this will run uic on .ui files:
   QT4_WRAP_UI( ITKVTKQT_UI_HDRS ${ITKVTKQT_UIS} )

@@ -15,13 +15,24 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
-    <widget class="QWidget" name="widget" native="true"/>
+    <widget class="QVTKWidget" name="widget" native="true"/>
    </item>
    <item row="0" column="1">
-    <widget class="QWidget" name="widget_2" native="true"/>
+    <widget class="QVTKWidget" name="qvtkWidget_a" native="true"/>
+   </item>
+   <item row="0" column="2">
+    <widget class="QVTKWidget" name="qvtkWidget_b" native="true"/>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QVTKWidget</class>
+   <extends>QWidget</extends>
+   <header>QVTKWidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
